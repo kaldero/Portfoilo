@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Alex Rivera | Shopify Architecture & Engineering</title>
+  <style>
+    /* ---------- RESET & BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #05070a;
+      color: #eef2ff;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    /* ---------- DARK MODE CORE VARIABLES ---------- */
+    :root {
+      --bg-primary: #05070a;
+      --bg-secondary: #0c0f17;
+      --bg-card: #0f111a;
+      --bg-elevated: #1a1f2e;
+      --border-dim: #232838;
+      --text-primary: #f0f3fa;
+      --text-secondary: #a9b3d1;
+      --accent: #00e5ff;
+      --accent-glow: rgba(0, 229, 255, 0.25);
+      --accent-dark: #0095b3;
+      --btn-primary-bg: linear-gradient(135deg, #00e5ff 0%, #0077ff 100%);
+      --btn-primary-hover: linear-gradient(135deg, #33ebff 0%, #338cff 100%);
+      --card-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.6);
+      --glow-cyan: 0 0 18px rgba(0, 229, 255, 0.3);
+    }
+
+    /* ---------- TYPOGRAPHY & UTILITIES ---------- */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section {
+      padding: 5rem 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff, #b9f3ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .title-underline {
+      width: 70px;
+      height: 4px;
+      background: var(--accent);
+      margin: 0 auto 3rem auto;
+      border-radius: 4px;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ---------- NAVIGATION ---------- */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(5, 7, 10, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      background: linear-gradient(135deg, #fff 30%, #00e5ff 80%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .logo span {
+      background: none;
+      color: #00e5ff;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+
+    .nav-link:hover {
+      color: var(--accent);
+      text-shadow: 0 0 6px var(--accent-glow);
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+    }
+
+    .bar {
+      width: 28px;
+      height: 2px;
+      background-color: #eef2ff;
+      margin: 5px 0;
+      transition: 0.3s;
+      border-radius: 4px;
+    }
+
+    /* ---------- HERO SECTION ---------- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 1.5rem;
+    }
+
+    .gradient-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(0, 229, 255, 0.08), transparent 60%),
+                  radial-gradient(circle at 80% 70%, rgba(0, 119, 255, 0.06), transparent 70%);
+      pointer-events: none;
+    }
+
+    .glow-orb {
+      position: absolute;
+      width: 40vw;
+      height: 40vw;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .glow-orb-1 {
+      background: #00e5ff;
+      top: -20%;
+      left: -10%;
+    }
+
+    .glow-orb-2 {
+      background: #3b82f6;
+      bottom: -20%;
+      right: -10%;
+    }
+
+    .hero-content {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+
+    .hero-title {
+      font-size: 3.3rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #ffffff, #a5f3ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-tagline {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: var(--btn-primary-bg);
+      color: #010101;
+      box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px -5px rgba(0, 229, 255, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 229, 255, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .scroll-indicator {
+      margin-top: 2rem;
+      animation: bounce 2s infinite;
+      color: var(--accent);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* ---------- FEATURED CASE STUDIES ---------- */
+    .case-studies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .case-card {
+      background: var(--bg-card);
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid var(--border-dim);
+      transition: all 0.3s ease;
+    }
+
+    .case-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 30px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .case-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .case-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .case-description {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .case-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: gap 0.2s;
+    }
+
+    .case-link:hover {
+      gap: 0.8rem;
+    }
+
+    /* ---------- CAPABILITIES GRID ---------- */
+    .capabilities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .capability-item {
+      background: rgba(15, 17, 26, 0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 24px;
+      padding: 1.8rem;
+      border: 1px solid var(--border-dim);
+      transition: all 0.2s;
+    }
+
+    .capability-item:hover {
+      border-color: var(--accent);
+      background: rgba(26, 31, 46, 0.8);
+    }
+
+    .capability-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .capability-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+    }
+
+    .capability-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* ---------- PHILOSOPHY SECTION ---------- */
+    .philosophy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .philosophy-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 1.8rem;
+      border-left: 3px solid var(--accent);
+    }
+
+    .philosophy-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+
+    .philosophy-text {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- TECH STACK ---------- */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 1.5rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .tech-item {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 1.2rem 0.5rem;
+      transition: all 0.2s;
+      border: 1px solid var(--border-dim);
+    }
+
+    .tech-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .tech-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tech-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* ---------- ABOUT SECTION (PERSONAL PROFILE) ---------- */
+    .about-profile {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .about-text {
+      flex: 2;
+    }
+
+    .about-text p {
+      margin-bottom: 1.2rem;
+      color: var(--text-secondary);
+    }
+
+    .about-image {
+      flex: 1;
+      text-align: center;
+    }
+
+    .avatar-img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+    }
+
+    /* ---------- CONTACT SECTION ---------- */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+    }
+
+    .contact-heading {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .contact-description {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .contact-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: inherit;
+      padding: 0.6rem;
+      border-radius: 24px;
+      transition: 0.2s;
+      background: rgba(17, 20, 31, 0.5);
+    }
+
+    .contact-item:hover {
+      background: var(--bg-elevated);
+      transform: translateX(5px);
+    }
+
+    .contact-icon svg {
+      stroke: var(--accent);
+    }
+
+    .contact-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .contact-value {
+      font-weight: 500;
+    }
+
+    .contact-form {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 32px;
+      border: 1px solid var(--border-dim);
+    }
+
+    .form-group {
+      margin-bottom: 1.3rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      background: #0a0e17;
+      border: 1px solid var(--border-dim);
+      border-radius: 20px;
+      color: white;
+      font-family: inherit;
+      transition: 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2);
+    }
+
+    /* ---------- FOOTER ---------- */
+    .footer {
+      border-top: 1px solid var(--border-dim);
+      padding: 2.5rem 0;
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-link svg {
+      stroke: #b0bbdf;
+      transition: 0.2s;
+    }
+
+    .social-link:hover svg {
+      stroke: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .copyright {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: #6c7aa5;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 860px) {
+      .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background: rgba(5, 7, 10, 0.95);
+        backdrop-filter: blur(20px);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 2rem 0;
+        gap: 1.8rem;
+        border-bottom: 1px solid var(--accent);
+      }
+      .nav-menu.active {
+        left: 0;
+      }
+      .menu-toggle {
+        display: flex;
+      }
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+      .about-profile {
+        flex-direction: column-reverse;
+        text-align: center;
+      }
+      .section {
+        padding: 3rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">Dev<span>.</span></a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#" class="nav-link">Home</a></li>
+        <li><a href="#work" class="nav-link">Work</a></li>
+        <li><a href="#capabilities" class="nav-link">Capabilities</a></li>
+        <li><a href="#philosophy" class="nav-link">Philosophy</a></li>
+        <li><a href="#tech" class="nav-link">Tech</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <button class="menu-toggle" id="menuToggle" aria-label="menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="gradient-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">ENGINEERING RESILIENT COMMERCE SYSTEMS.</h1>
+      <p class="hero-tagline">
+        I help merchants scale by replacing heavy app dependencies with clean, native Shopify architecture. 
+        <br>Focus on <span class="highlight">stability, speed, and long-term maintainability.</span>
+      </p>
+      <div class="hero-buttons">
+        <a href="#work" class="btn btn-primary">✦ View Case Studies</a>
+        <a href="#contact" class="btn btn-secondary">📬 Start a Project</a>
+      </div>
+      <div class="scroll-indicator">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M19 12l-7 7-7-7"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="work" class="section">
+    <div class="container">
+      <h2 class="section-title">Featured Architecture</h2>
+      <div class="title-underline"></div>
+      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">Selected Case Studies // 2025-2026 CRAFTED ARCHITECTURE</p>
+      <div class="case-studies-grid">
+        <div class="case-card">
+          <span class="case-tag">THE NATIVE CORE</span>
+          <h3 class="case-title">Project A</h3>
+          <p class="case-description">A completely custom theme built without the overhead of CSS frameworks. Pure, efficient code to deliver maximum speed and total design flexibility.</p>
+          <a href="https://ajl-handicraft.myshopify.com/" target="_blank" class="case-link">VIEW DEV STORE →</a>
+          <p style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--accent);">Access Code: SampleOne</p>
+        </div>
+        <div class="case-card">
+          <span class="case-tag">THEME OPTIMIZATION</span>
+          <h3 class="case-title">The Refined Dawn Build</h3>
+          <p class="case-description">Enhanced the standard Dawn theme by integrating custom Liquid features, elevating site speed to create a seamless, high-performance, scalable shopping experience.</p>
+          <a href="https://mdspasalubong.myshopify.com/" target="_blank" class="case-link">VIEW DEV STORE →</a>
+          <p style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--accent);">Access Code: SampleTwo</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="capabilities" class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-title">Capabilities</h2>
+      <div class="title-underline"></div>
+      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">Tech Solutions for Merchants //</p>
+      <div class="capabilities-grid">
+        <div class="capability-item"><div class="capability-number">01_</div><div class="capability-title">Custom Sections & Blocks</div><div class="capability-desc">Building reusable and flexible Liquid sections that empower your team to manage content without touching code.</div></div>
+        <div class="capability-item"><div class="capability-number">02_</div><div class="capability-title">Tech Debt Elimination</div><div class="capability-desc">Replacing high-latency apps with native frontend logic to slash load times and monthly overhead costs.</div></div>
+        <div class="capability-item"><div class="capability-number">03_</div><div class="capability-title">UI/UX Improvements</div><div class="capability-desc">Refining the customer journey with high-performance animations and mobile-first interface.</div></div>
+        <div class="capability-item"><div class="capability-number">04_</div><div class="capability-title">Core Web Vitals Audit</div><div class="capability-desc">Deep-layer optimization targeting LCP and CLS to ensure your store ranks higher and retains users.</div></div>
+        <div class="capability-item"><div class="capability-number">05_</div><div class="capability-title">Custom Landing Systems</div><div class="capability-desc">Engineered for paid traffic. High-performance, custom-coded pages that convert better than generic templates.</div></div>
+        <div class="capability-item"><div class="capability-number">06_</div><div class="capability-title">Bug Fixes & Enhancements</div><div class="capability-desc">Technical troubleshooting and continuous store improvements to keep things running smoothly.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="philosophy" class="section">
+    <div class="container">
+      <h2 class="section-title">Development Philosophy</h2>
+      <div class="title-underline"></div>
+      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">Scalability Over Shortcuts //</p>
+      <div class="philosophy-grid">
+        <div class="philosophy-card"><div class="philosophy-title">Protocol_01 · Performance First</div><div class="philosophy-text">Lightweight and optimized code for speed. Every millisecond counts in commerce, so I prioritize Core Web Vitals from day one.</div></div>
+        <div class="philosophy-card"><div class="philosophy-title">Protocol_02 · Native Implementation</div><div class="philosophy-text">If it can be built with Liquid and Vanilla JS, it should be. Minimizing app-reliance ensures security and long-term theme stability.</div></div>
+        <div class="philosophy-card"><div class="philosophy-title">Protocol_03 · Future-Proof Scaling</div><div class="philosophy-text">Building using Shopify 2.0 standards, utilizing Metafields and Metaobjects to create data-driven stores that grow effortlessly.</div></div>
+        <div class="philosophy-card"><div class="philosophy-title">Protocol_04 · Mobile-First</div><div class="philosophy-text">Premium mobile shopping experience is the standard. I ensure every interaction is tactile and optimized for touch-screen users.</div></div>
+        <div class="philosophy-card"><div class="philosophy-title">Principle_05 · Structured Workflow</div><div class="philosophy-text">From Git-based version control to clear documentation, my process ensures transparency and precision in every deployment.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tech" class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-title">Technical Arsenal</h2>
+      <div class="title-underline"></div>
+      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">Skills & Tech Stack //</p>
+      <div class="tech-grid">
+        <div class="tech-item"><div class="tech-icon">🛍️</div><div class="tech-name">Shopify</div></div>
+        <div class="tech-item"><div class="tech-icon">⚛️</div><div class="tech-name">React</div></div>
+        <div class="tech-item"><div class="tech-icon">🧩</div><div class="tech-name">Liquid</div></div>
+        <div class="tech-item"><div class="tech-icon">⚡</div><div class="tech-name">Vanilla JS</div></div>
+        <div class="tech-item"><div class="tech-icon">🎨</div><div class="tech-name">CSS3/Tailwind</div></div>
+        <div class="tech-item"><div class="tech-icon">🐙</div><div class="tech-name">Git/GitHub</div></div>
+        <div class="tech-item"><div class="tech-icon">🔧</div><div class="tech-name">Hydrogen</div></div>
+        <div class="tech-item"><div class="tech-icon">📊</div><div class="tech-name">Metaobjects</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title">Behind the Systems</h2>
+      <div class="title-underline"></div>
+      <div class="about-profile">
+        <div class="about-text">
+          <p><strong>Alex Rivera — Shopify Developer // Remote (Global)</strong></p>
+          <p>I build reliable, well-structured Shopify stores with a strong focus on long-term stability and performance. I prioritize clean architecture and practical solutions that support sustainable growth.</p>
+          <p>I approach each project as a system of connected parts that need to work seamlessly behind the scenes. I aim to ensure everything runs smoothly and efficiently. Through clean, thoughtful code and careful attention to detail, I help turn complex requirements into simple, intuitive experiences—so your store operates with confidence and your results speak for themselves.</p>
+        </div>
+        <div class="about-image">
+          <img src="https://images.unsplash.com/photo-1600896997793-b8ed3459a17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBkZXZlbG9wZXIlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDF8fHx8MTc3NTc3ODIzMnww&ixlib=rb-4.1.0&q=80&w=1080" alt="Alex Rivera" class="avatar-img">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-title">Let’s Build Something That Converts</h2>
+      <div class="title-underline"></div>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h3 class="contact-heading">Work with a Shopify architect.</h3>
+          <p class="contact-description">If you're looking for a Shopify developer who focuses on clean implementation and practical solutions, I’d be happy to collaborate.</p>
+          <div class="contact-items">
+            <a href="mailto:hello@shopifydev.io" class="contact-item"><div class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div><div class="contact-details"><p class="contact-label">Email</p><p class="contact-value">hello@shopifydev.io</p></div></a>
+            <div class="contact-item"><div class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><div class="contact-details"><p class="contact-label">Location</p><p class="contact-value">Remote · Worldwide</p></div></div>
+          </div>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <div class="form-group"><label>Full name</label><input type="text" placeholder="Jamie Lee" required></div>
+          <div class="form-group"><label>Email address</label><input type="email" placeholder="jamie@store.com" required></div>
+          <div class="form-group"><label>Project scope</label><textarea rows="4" placeholder="Tell me about your Shopify architecture needs..."></textarea></div>
+          <button type="submit" class="btn btn-primary btn-full"><span>Send inquiry</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="social-links">
+        <a href="#" class="social-link" aria-label="GitHub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a>
+        <a href="#" class="social-link"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+        <a href="#" class="social-link"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a>
+      </div>
+      <p class="copyright">© <span id="currentYear"></span> Alex Rivera — Clean Shopify Architecture • Native • Future‑Proof <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4d6d" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></p>
+    </div>
+  </footer>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+    menuToggle?.addEventListener('click', () => navMenu.classList.toggle('active'));
+    document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => navMenu.classList.remove('active')));
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
+    document.getElementById('contactForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Thank you for reaching out! I will reply within 24h to discuss your architecture goals.');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
