@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Raymart Collantes | Shopify Developer</title>
+  <title>Raymart Collantes | Shopify + WordPress Architect</title>
   <style>
     /* ---------- RESET & BASE ---------- */
     * {
@@ -277,61 +277,105 @@
       50% { transform: translateY(8px); }
     }
 
-    /* ---------- FEATURED CASE STUDIES ---------- */
-    .case-studies-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
+    /* ---------- PROJECTS GRID (SELECTED WORK) ---------- */
+    .projects-filter {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
     }
 
-    .case-card {
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border-dim);
+      color: var(--text-secondary);
+      padding: 0.5rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent);
+      color: #05070a;
+      border-color: var(--accent);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .project-card {
       background: var(--bg-card);
       border-radius: 28px;
-      padding: 2rem;
+      overflow: hidden;
       border: 1px solid var(--border-dim);
       transition: all 0.3s ease;
     }
 
-    .case-card:hover {
+    .project-card:hover {
       transform: translateY(-6px);
       border-color: var(--accent);
       box-shadow: 0 20px 30px -15px rgba(0, 0, 0, 0.5);
     }
 
-    .case-tag {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-      display: inline-block;
+    .project-content {
+      padding: 1.8rem;
     }
 
-    .case-title {
-      font-size: 1.6rem;
-      font-weight: 700;
+    .project-type {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(0, 229, 255, 0.15);
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      color: var(--accent);
       margin-bottom: 1rem;
     }
 
-    .case-description {
-      color: var(--text-secondary);
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
+    .project-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
     }
 
-    .case-link {
+    .project-url {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .project-url a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--accent);
+    }
+
+    .project-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    .project-link {
       color: var(--accent);
       text-decoration: none;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      transition: gap 0.2s;
-    }
-
-    .case-link:hover {
-      gap: 0.8rem;
     }
 
     /* ---------- CAPABILITIES GRID ---------- */
@@ -376,32 +420,6 @@
       line-height: 1.5;
     }
 
-    /* ---------- PHILOSOPHY SECTION ---------- */
-    .philosophy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-
-    .philosophy-card {
-      background: var(--bg-card);
-      border-radius: 20px;
-      padding: 1.8rem;
-      border-left: 3px solid var(--accent);
-    }
-
-    .philosophy-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 0.8rem;
-    }
-
-    .philosophy-text {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-
     /* ---------- TECH STACK ---------- */
     .tech-grid {
       display: grid;
@@ -434,7 +452,7 @@
       font-weight: 500;
     }
 
-    /* ---------- ABOUT SECTION (PERSONAL PROFILE) ---------- */
+    /* ---------- ABOUT SECTION ---------- */
     .about-profile {
       display: flex;
       flex-wrap: wrap;
@@ -458,8 +476,8 @@
     }
 
     .avatar-img {
-      width: 180px;
-      height: 180px;
+      width: 280px;
+      height: 280px;
       object-fit: cover;
       border-radius: 50%;
       border: 3px solid var(--accent);
@@ -655,7 +673,7 @@
       <h1 class="hero-title">Optimizing Commerce Through Resilient Engineering</h1>
       <p class="hero-tagline">
         I empower merchants to grow by simplifying their tech stack, replacing heavy app reliance with clean, <br> Shopify builds   
-        that prioritize <span class="highlight">performance, reliability, and sustainability..</span>
+        that prioritize <span class="highlight">performance, reliability, and sustainability.</span>
       </p>
       <div class="hero-buttons">
         <a href="#work" class="btn btn-primary">✦ View Case Studies</a>
@@ -669,25 +687,112 @@
     </div>
   </section>
 
+  <!-- SELECTED WORK SECTION (ALL PROJECTS) -->
   <section id="work" class="section">
     <div class="container">
-      <h2 class="section-title">Featured Architecture</h2>
+      <h2 class="section-title">Selected Work</h2>
       <div class="title-underline"></div>
-      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">Selected Case Studies // 2025-2026 CRAFTED ARCHITECTURE</p>
-      <div class="case-studies-grid">
-        <div class="case-card">
-          <span class="case-tag">THE NATIVE CORE</span>
-          <h3 class="case-title">Project A</h3>
-          <p class="case-description">A completely custom theme built without the overhead of CSS frameworks. Pure, efficient code to deliver maximum speed and total design flexibility.</p>
-          <a href="https://ajl-handicraft.myshopify.com/" target="_blank" class="case-link">VIEW DEV STORE →</a>
-          <p style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--accent);">Access Code: SampleOne</p>
+      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">Live Shopify + WordPress stores I've built and maintained</p>
+      
+      <div class="projects-filter" id="filterButtons">
+        <button class="filter-btn active" data-filter="all">All Projects</button>
+        <button class="filter-btn" data-filter="shopify">Shopify</button>
+        <button class="filter-btn" data-filter="wordpress">WordPress</button>
+      </div>
+
+      <div class="projects-grid" id="projectsGrid">
+        <!-- Shopify Projects -->
+        <div class="project-card" data-type="shopify">
+          <div class="project-content">
+            <span class="project-type">🛍️ Shopify</span>
+            <h3 class="project-title">Foareps</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://foareps.com" target="_blank" rel="noopener">foareps.com</a></div>
+            <p class="project-description">Custom Shopify theme with advanced product filtering, seamless checkout optimization, and conversion-focused design for outdoor gear.</p>
+            <a href="https://foareps.com" target="_blank" class="project-link">Visit live store →</a>
+          </div>
         </div>
-        <div class="case-card">
-          <span class="case-tag">THEME OPTIMIZATION</span>
-          <h3 class="case-title">The Refined Dawn Build</h3>
-          <p class="case-description">Enhanced the standard Dawn theme by integrating custom Liquid features, elevating site speed to create a seamless, high-performance, scalable shopping experience.</p>
-          <a href="https://mdspasalubong.myshopify.com/" target="_blank" class="case-link">VIEW DEV STORE →</a>
-          <p style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--accent);">Access Code: SampleTwo</p>
+        <div class="project-card" data-type="shopify">
+          <div class="project-content">
+            <span class="project-type">🛍️ Shopify</span>
+            <h3 class="project-title">Outdoor Folk</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://outdoorfolk.com.au" target="_blank" rel="noopener">outdoorfolk.com.au</a></div>
+            <p class="project-description">Performance-driven store for adventure gear. Built custom metafields, dynamic bundles, and improved Core Web Vitals significantly.</p>
+            <a href="https://outdoorfolk.com.au" target="_blank" class="project-link">Visit live store →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="shopify">
+          <div class="project-content">
+            <span class="project-type">🛍️ Shopify</span>
+            <h3 class="project-title">PNK Boutique</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://pnkboutique.com" target="_blank" rel="noopener">pnkboutique.com</a></div>
+            <p class="project-description">Fashion e‑commerce with unique liquid sections, AJAX cart, and full responsive design tailored for mobile shoppers.</p>
+            <a href="https://pnkboutique.com" target="_blank" class="project-link">Visit live store →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="shopify">
+          <div class="project-content">
+            <span class="project-type">🛍️ Shopify</span>
+            <h3 class="project-title">Juvabun</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://juvabun.com" target="_blank" rel="noopener">juvabun.com</a></div>
+            <p class="project-description">Beauty & skincare brand. Integrated subscription app, custom theme modifications, and optimized product pages for higher AOV.</p>
+            <a href="https://juvabun.com" target="_blank" class="project-link">Visit live store →</a>
+          </div>
+        </div>
+
+        <!-- WordPress Projects -->
+        <div class="project-card" data-type="wordpress">
+          <div class="project-content">
+            <span class="project-type">📄 WordPress</span>
+            <h3 class="project-title">Crown Heights Hosiery</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://crownheightshosiery.com" target="_blank" rel="noopener">crownheightshosiery.com</a></div>
+            <p class="project-description">Custom WordPress + WooCommerce build with advanced inventory management and tailored checkout flow.</p>
+            <a href="https://crownheightshosiery.com" target="_blank" class="project-link">Visit site →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="wordpress">
+          <div class="project-content">
+            <span class="project-type">📄 WordPress</span>
+            <h3 class="project-title">Pocket Classroom</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://pocketclassroom.info" target="_blank" rel="noopener">pocketclassroom.info</a></div>
+            <p class="project-description">Educational platform with custom post types, membership restrictions, and interactive course layouts.</p>
+            <a href="https://pocketclassroom.info" target="_blank" class="project-link">Visit site →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="wordpress">
+          <div class="project-content">
+            <span class="project-type">📄 WordPress</span>
+            <h3 class="project-title">Cyber School Group</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://cyberschoolgroup.com" target="_blank" rel="noopener">cyberschoolgroup.com</a></div>
+            <p class="project-description">Multisite WordPress installation for educational network, featuring centralized management and custom themes.</p>
+            <a href="https://cyberschoolgroup.com" target="_blank" class="project-link">Visit site →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="wordpress">
+          <div class="project-content">
+            <span class="project-type">📄 WordPress</span>
+            <h3 class="project-title">Irish Tours For You</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://irishtoursforyou.com" target="_blank" rel="noopener">irishtoursforyou.com</a></div>
+            <p class="project-description">Tourism website with booking engine integration, SEO-optimized content structure, and responsive design.</p>
+            <a href="https://irishtoursforyou.com" target="_blank" class="project-link">Visit site →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="wordpress">
+          <div class="project-content">
+            <span class="project-type">📄 WordPress</span>
+            <h3 class="project-title">Atlas Turf</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://atlasturf.com.au" target="_blank" rel="noopener">atlasturf.com.au</a></div>
+            <p class="project-description">Corporate WordPress site with product catalogs, enquiry forms, and performance optimizations for Australian audience.</p>
+            <a href="https://atlasturf.com.au" target="_blank" class="project-link">Visit site →</a>
+          </div>
+        </div>
+        <div class="project-card" data-type="wordpress">
+          <div class="project-content">
+            <span class="project-type">📄 WordPress</span>
+            <h3 class="project-title">Somerzby</h3>
+            <div class="project-url"><span>🔗</span> <a href="https://somerzby.com.au" target="_blank" rel="noopener">somerzby.com.au</a></div>
+            <p class="project-description">Pet products e‑commerce (WooCommerce) with custom product configurator and streamlined checkout.</p>
+            <a href="https://somerzby.com.au" target="_blank" class="project-link">Visit site →</a>
+          </div>
         </div>
       </div>
     </div>
@@ -709,7 +814,6 @@
     </div>
   </section>
 
-  
   <section id="tech" class="section" style="background: var(--bg-secondary);">
     <div class="container">
       <h2 class="section-title">Technical Arsenal</h2>
@@ -737,7 +841,7 @@
           <p>I specialize in creating and customizing themes that are not only visually engaging but also strategically optimized for performance and conversions. Highly organized and tech‑savvy, I thrive in checklist‑driven workflows and bring a structured, detail‑oriented approach to every project.</p>
         </div>
         <div class="about-image">
-          <img src="https://images.unsplash.com/photo-1600896997793-b8ed3459a17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBkZXZlbG9wZXIlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDF8fHx8MTc3NTc3ODIzMnww&ixlib=rb-4.1.0&q=80&w=1080" alt="Alex Rivera" class="avatar-img">
+          <img src="C:\Users\Administrator\Desktop\Portfolio\profile.jpg" alt="Raymart Collantes" class="avatar-img">
         </div>
       </div>
     </div>
@@ -787,6 +891,25 @@
       e.preventDefault();
       alert('Thank you for reaching out! I will reply within 24h to discuss your architecture goals.');
       e.target.reset();
+    });
+
+    // Filter functionality for projects
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projects = document.querySelectorAll('.project-card');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filterValue = btn.getAttribute('data-filter');
+        projects.forEach(project => {
+          if (filterValue === 'all' || project.getAttribute('data-type') === filterValue) {
+            project.style.display = 'block';
+          } else {
+            project.style.display = 'none';
+          }
+        });
+      });
     });
   </script>
 </body>
